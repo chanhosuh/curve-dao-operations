@@ -6,25 +6,18 @@ from ape.logging import logger
 from curve_dao import make_vote, select_target
 
 
-@click.group(short_help="Create a Curve DAO vote")
-def cli():
-    """Cammand-line helper for creating different DAO votes"""
-    pass
-
-
-@cli.command(
+@click.command(
     cls=ape.cli.NetworkBoundCommand,
-    name="change_parameters",
     short_help="Change parameters for a pool",
 )
 @ape.cli.network_option()
 @ape.cli.account_option()
-def change_parameters(
+def cli(
     network,
     account,
 ):
     """
-    ape run parameter_change_votes change_parameters --account <account index or alias> --network <network>
+    ape run parameter_change_votes --account <account index or alias> --network <network>
 
     TriCryptoINV
     A: 1707629
