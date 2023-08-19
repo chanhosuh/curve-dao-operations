@@ -16,12 +16,10 @@ ethereum:
     transaction_acceptance_timeout: 99999999
 
 hardhat:
-  # port: auto
   fork:
     ethereum:
       mainnet:
         upstream_provider: alchemy
-        # upstream_provider: geth
 
 geth:
   ethereum:
