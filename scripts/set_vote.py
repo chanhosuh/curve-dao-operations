@@ -8,6 +8,7 @@ from ape.logging import logger
 from curve_dao import make_vote
 from curve_dao.addresses import get_dao_voting_contract
 from curve_dao.modules.smartwallet_checker import whitelist_vecrv_lock
+from curve_dao.simulate import simulate
 
 
 # Missing name issue for AccountAliasPromptChoice is not fixed until
@@ -196,6 +197,18 @@ def change_parameters(
             future_gamma,
             future_time,
         )
+        parameter_action = (
+            CRYPTOSWAP_OWNER_PROXY,
+            "commit_new_parameters",
+            crypto_factory_pool.address,
+            new_mid_fee,
+            new_out_fee,
+            new_admin_fee,
+            new_fee_gamma,
+            new_allowed_extra_profit,
+            new_adjustment_step,
+            new_ma_time,
+        )
     if pool_type == "tricrypto_ng":
         ramp_action = (
             address,
@@ -216,12 +229,6 @@ def change_parameters(
         )
     if pool_type == "stableswap":
         raise Exception("Not supported yet.")
-        kill_action = (
-            CURVE_DAO_OWNERSHIP["agent"],
-            "set_killed",
-            address,
-            True,
-        )
 
     target = select_target("ownership")
     tx = make_vote(
@@ -236,3 +243,78 @@ def change_parameters(
         break
 
     logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
+
+
+@cli.command(
+    cls=ape.cli.NetworkBoundCommand,
+    name="pegkeeper_debt_ceiling",
+    short_help="Set the pegkeeper debt ceiling",
+)
+@ape.cli.network_option()
+@ape.cli.account_option()
+@click.option("--address", "-a", type=str, required=True, help="Pegkeeper address")
+@click.option("--ceiling", "-c", type=str, required=True, help="New debt ceiling")
+@click.option("--description", "-d", type=str, required=True)
+def pegkeeper_debt_ceiling(
+    network,
+    account,
+    address,
+    ceiling,
+    description,
+):
+    """
+    ape run pegkeeper_debt_ceiling --account <account index or alias> --network <network>
+    """
+
+    # Controller factory
+    factory_address = "0xC9332fdCB1C491Dcc683bAe86Fe3cb70360738BC"
+    # TUSD peg keeper
+    pegkeeper_address = "0x1ef89ed0edd93d1ec09e4c07373f69c49f4dccae"
+    # pegkeeper_address = address
+    # current debt ceiling: 25000000000000000000000000
+    new_debt_ceiling = 1_000_000_000000000000000000
+    description = "fill this in!"
+
+    if "mainnet-fork" in network:
+        # Override account with a properly setup user
+        logger.info("Using test user account")
+        account = ape.accounts["0x9c5083dd4838E120Dbeac44C052179692Aa5dAC5"]
+
+    factory = ape.Contract(factory_address)
+    current_ceiling = factory.debt_ceiling(pegkeeper_address)
+    assert current_ceiling != ceiling, "New debt ceiling is the same as current value"
+
+    target = select_target("ownership")
+
+    set_ceiling_action = (
+        factory_address,
+        "set_debt_ceiling",
+        pegkeeper_address,
+        new_debt_ceiling,
+    )
+    actions = [set_ceiling_action]
+
+    # burn excess crvUSD
+    if ceiling < current_ceiling:
+        burn_action = (factory_address, "rug_debt_ceiling", pegkeeper_address)
+        actions.append(burn_action)
+
+    tx = make_vote(
+        target=target,
+        actions=actions,
+        description=description,
+        vote_creator=account,
+    )
+
+    for log in tx.decode_logs():
+        vote_id = log.event_arguments["voteId"]
+        break
+
+    logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
+
+    # For testing, since malformed script can be set in vote, we need to
+    # execute to double-check everything really works.
+    simulate(vote_id, CURVE_DAO_OWNERSHIP["voting"])
+    assert (
+        factory.debt_ceiling(pegkeeper_address) == new_debt_ceiling
+    ), "Debt ceiling doesn't match expected new value."
