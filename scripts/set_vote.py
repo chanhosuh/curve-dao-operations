@@ -6,7 +6,12 @@ from ape.cli.options import _account_callback
 from ape.logging import logger
 
 from curve_dao import make_vote
-from curve_dao.addresses import get_dao_voting_contract
+from curve_dao.addresses import (
+    STABLESWAP_FACTORY_OWNER,
+    STABLESWP_OWNER,
+    get_dao_voting_contract,
+    select_target,
+)
 from curve_dao.modules.smartwallet_checker import whitelist_vecrv_lock
 from curve_dao.simulate import simulate
 
@@ -162,14 +167,17 @@ def kill_gauge(
 @click.option(
     "--pool-type",
     "-t",
-    type=click.Choice(["stableswap", "crypto_factory", "tricrypto_ng"]),
+    type=click.Choice(
+        ["stableswap", "stableswap_factory", "crypto_factory", "tricrypto_ng"]
+    ),
     required=True,
 )
 @click.option(
-    "--parameter-action",
+    "--parameter",
     "-p",
-    type=click.Choice(["ramp", "commit"]),
     required=True,
+    multiple=True,
+    type=(str, int),
 )
 @click.option("--description", "-d", type=str, required=True)
 def change_parameters(
@@ -187,8 +195,22 @@ def change_parameters(
         # Override account with a properly setup user
         account = ape.accounts["0x9c5083dd4838E120Dbeac44C052179692Aa5dAC5"]
 
+    valid_parameters = set(
+        "A",
+        "gamma",
+        "fee",
+        "admin_fee",
+        "mid_fee",
+        "out_fee",
+        "fee_gamma",
+        "allowed_extra_profit",
+        "adjustment_step",
+        "ma_time",
+        "future_time",
+    )
+    parameters = dict(parameter)
+
     if pool_type == "crypto_factory":
-        raise Exception("Not supported yet.")
         ramp_action = (
             CRYPTOSWAP_OWNER_PROXY,
             "ramp_A_gamma",
@@ -227,13 +249,39 @@ def change_parameters(
             new_adjustment_step,
             new_ma_time,
         )
-    if pool_type == "stableswap":
-        raise Exception("Not supported yet.")
+    if pool_type in ["stableswap", "stableswap_factory"]:
+        if pool_type == "stableswap":
+            owner_proxy = STABLESWP_OWNER
+        if pool_type == "stableswap_factory":
+            owner_proxy = STABLESWAP_FACTORY_OWNER
+
+        actions = []
+        if "A" in parameters:
+            future_A = parameters["A"]
+            default_future_time = ape.chain.pending_timestamp + 7 * 86400
+            future_time = parameters.get("future_time", default_future_time)
+            ramp_action = (
+                owner_proxy,
+                "ramp_A",
+                address,
+                future_A,
+                future_time,
+            )
+            actions.append(ramp_action)
+        if "fee" in parameters:
+            new_fee = parameters["fee"]
+            fee_action = (
+                owner_proxy,
+                "commit_new_fee",
+                address,
+                new_fee,
+            )
+            actions.append(fee_action)
 
     target = select_target("ownership")
     tx = make_vote(
         target=target,
-        actions=[kill_action],
+        actions=actions,
         description=description,
         vote_creator=account,
     )
