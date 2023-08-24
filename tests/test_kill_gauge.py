@@ -4,6 +4,7 @@ import pytest
 from curve_dao.addresses import (
     CRYPTOSWAP_FACTORY_OWNER,
     CURVE_DAO_OWNERSHIP,
+    STABLESWAP_FACTORY_OWNER,
     STABLESWAP_GAUGE_OWNER,
 )
 from curve_dao.simulate import simulate
@@ -26,6 +27,12 @@ def tricrypto_ng_gauge():
 def stableswap_gauge():
     # USDP metapool (pre-factory)
     yield ape.Contract("0x055be5ddb7a925bfef3417fc157f53ca77ca7222")
+
+
+@pytest.fixture(scope="module")
+def stableswap_factory_gauge():
+    # BUSD-FRAXBP
+    yield ape.Contract("0xAeac6Dcd12CC0BE74c8f99EfE4bB5205a1f9A608")
 
 
 def test_kill_factory_gauge(vote_deployer, crypto_factory_gauge):
@@ -103,3 +110,29 @@ def test_kill_stableswap_gauge(vote_deployer, stableswap_gauge):
     )
 
     assert stableswap_gauge.is_killed() is True
+
+
+def test_kill_stableswap_factory_gauge(vote_deployer, stableswap_factory_gauge):
+    assert stableswap_factory_gauge.is_killed() is False
+
+    kill_action = (
+        STABLESWAP_FACTORY_OWNER,
+        "set_killed",
+        stableswap_factory_gauge.address,
+        True,
+    )
+
+    vote_id = make_vote(
+        target=CURVE_DAO_OWNERSHIP,
+        actions=[kill_action],
+        description="test",
+        vote_creator=vote_deployer,
+    )
+
+    # this advances the chain one week from vote creation
+    simulate(
+        vote_id=vote_id,
+        voting_contract=CURVE_DAO_OWNERSHIP["voting"],
+    )
+
+    assert stableswap_factory_gauge.is_killed() is True
