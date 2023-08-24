@@ -2,7 +2,7 @@ import ape
 import pytest
 
 from curve_dao.addresses import (
-    CRYPTOSWAP_OWNER_PROXY,
+    CRYPTOSWAP_FACTORY_OWNER,
     CURVE_DAO_OWNERSHIP,
     CURVE_DAO_PARAM,
 )
@@ -34,7 +34,7 @@ def test_crypto_factory_ramp_parameters(vote_deployer, crypto_factory_pool):
     future_time = last_timestamp + 2 * week_seconds
 
     parameter_action = (
-        CRYPTOSWAP_OWNER_PROXY,
+        CRYPTOSWAP_FACTORY_OWNER,
         "ramp_A_gamma",
         crypto_factory_pool.address,
         future_A,
@@ -118,7 +118,7 @@ def test_crypto_factory_commit_parameters(vote_deployer, crypto_factory_pool):
     new_ma_time = 600
 
     parameter_action = (
-        CRYPTOSWAP_OWNER_PROXY,
+        CRYPTOSWAP_FACTORY_OWNER,
         "commit_new_parameters",
         crypto_factory_pool.address,
         new_mid_fee,
@@ -150,7 +150,7 @@ def test_crypto_factory_commit_parameters(vote_deployer, crypto_factory_pool):
     ape.chain.mine(deltatime=3 * 86400)
     # calling `apply_new_parameters` requires the Parameter DAO
     agent = ape.Contract(CURVE_DAO_PARAM["agent"])
-    owner_proxy = ape.Contract(CRYPTOSWAP_OWNER_PROXY)
+    owner_proxy = ape.Contract(CRYPTOSWAP_FACTORY_OWNER)
     fn = getattr(owner_proxy, "apply_new_parameters")
     calldata = fn.as_transaction(crypto_factory_pool.address, sender=agent).data
     # FIXME: getting Aragon APP_AUTH_FAILED error here

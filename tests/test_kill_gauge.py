@@ -1,7 +1,7 @@
 import ape
 import pytest
 
-from curve_dao.addresses import CRYPTOSWAP_OWNER_PROXY, CURVE_DAO_OWNERSHIP
+from curve_dao.addresses import CRYPTOSWAP_FACTORY_OWNER, CURVE_DAO_OWNERSHIP
 from curve_dao.simulate import simulate
 from curve_dao.vote_utils import make_vote
 
@@ -22,7 +22,7 @@ def test_kill_factory_gauge(vote_deployer, crypto_factory_gauge):
     assert crypto_factory_gauge.is_killed() is False
 
     parameter_action = (
-        CRYPTOSWAP_OWNER_PROXY,
+        CRYPTOSWAP_FACTORY_OWNER,
         "set_killed",
         crypto_factory_gauge.address,
         True,
