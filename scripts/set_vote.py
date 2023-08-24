@@ -68,17 +68,12 @@ def cli():
 def whitelist(network, account, addr, description):
 
     target = get_dao_voting_contract("ownership")
-    tx = make_vote(
+    vote_id = make_vote(
         target=target,
         actions=[whitelist_vecrv_lock(addr)],
         description=description,
         vote_creator=account,
     )
-
-    for log in tx.decode_logs():
-        vote_id = log.event_arguments["voteId"]
-        break
-
     logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
 
 
@@ -142,17 +137,12 @@ def kill_gauge(
         )
 
     target = select_target("ownership")
-    tx = make_vote(
+    vote_id = make_vote(
         target=target,
         actions=[kill_action],
         description=description,
         vote_creator=account,
     )
-
-    for log in tx.decode_logs():
-        vote_id = log.event_arguments["voteId"]
-        break
-
     logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
 
 
