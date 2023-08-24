@@ -33,7 +33,7 @@ jobs:
       - name: Install Requirements
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install -r requirements-complete.txt
+          python3 -m pip install -r requirements.txt
 
       - name: Run Tests
         run: ape test
