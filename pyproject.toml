@@ -34,11 +34,6 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 
-[project.urls]
-Documentation = "https://curve-dao-operations.readthedocs.io"
-Repository = "https://github.com/curvefi/curve-dao-operations.git"
-Tracker = "https://github.com/curvefi/curve-dao-operations/issues"
-Changelog = "https://github.com/curvefi/curve-dao-operations/CHANGELOG.md"
 
 # Requirements
 dependencies = [
@@ -53,6 +48,12 @@ dependencies = [
     "pytest",
     "requests",
 ]
+
+[project.urls]
+Documentation = "https://curve-dao-operations.readthedocs.io"
+Repository = "https://github.com/curvefi/curve-dao-operations.git"
+Tracker = "https://github.com/curvefi/curve-dao-operations/issues"
+Changelog = "https://github.com/curvefi/curve-dao-operations/CHANGELOG.md"
 
 
 [build-system]
