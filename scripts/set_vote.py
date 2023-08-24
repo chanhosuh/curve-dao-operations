@@ -145,7 +145,7 @@ def kill_gauge(
             STABLESWAP_GAUGE_OWNER,
             "set_killed",
             address,
-            True,
+            kill,
         )
     if gauge_type == "stableswap_factory":
         kill_action = (
