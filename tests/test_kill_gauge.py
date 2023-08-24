@@ -28,16 +28,12 @@ def test_kill_factory_gauge(vote_deployer, crypto_factory_gauge):
         True,
     )
 
-    tx = make_vote(
+    vote_id = make_vote(
         target=CURVE_DAO_OWNERSHIP,
         actions=[parameter_action],
         description="test",
         vote_creator=vote_deployer,
     )
-
-    for log in tx.decode_logs():
-        vote_id = log.event_arguments["voteId"]
-        break
 
     # this advances the chain one week from vote creation
     simulate(
@@ -57,16 +53,12 @@ def test_kill_ng_gauge(vote_deployer, tricrypto_ng_gauge):
         True,
     )
 
-    tx = make_vote(
+    vote_id = make_vote(
         target=CURVE_DAO_OWNERSHIP,  # tricrypto-ng factory admin is OWNERSHIP agent
         actions=[parameter_action],
         description="test",
         vote_creator=vote_deployer,
     )
-
-    for log in tx.decode_logs():
-        vote_id = log.event_arguments["voteId"]
-        break
 
     # this advances the chain one week from vote creation
     simulate(
