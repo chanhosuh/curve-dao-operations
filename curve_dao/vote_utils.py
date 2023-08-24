@@ -75,7 +75,15 @@ def make_vote(target: Dict, actions: List[Tuple], description: str, vote_creator
         sender=vote_creator,
     )
 
-    return tx
+    vote_id = None
+    for log in tx.decode_logs():
+        vote_id = log.event_arguments["voteId"]
+        break
+
+    if not vote_id:
+        raise Exception("Vote ID not found.")
+
+    return vote_id
 
 
 def get_vote_script(vote_id: str, vote_type: str) -> str:

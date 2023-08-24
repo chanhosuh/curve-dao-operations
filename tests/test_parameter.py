@@ -45,16 +45,12 @@ def test_crypto_factory_ramp_parameters(vote_deployer, crypto_factory_pool):
     assert crypto_factory_pool.A() != future_A
     assert crypto_factory_pool.gamma() != future_gamma
 
-    tx = make_vote(
+    vote_id = make_vote(
         target=CURVE_DAO_PARAM,
         actions=[parameter_action],
         description="test",
         vote_creator=vote_deployer,
     )
-
-    for log in tx.decode_logs():
-        vote_id = log.event_arguments["voteId"]
-        break
 
     # this advances the chain one week from vote creation
     simulate(
@@ -89,16 +85,12 @@ def test_ng_ramp_parameters(vote_deployer, tricrypto_pool):
     assert tricrypto_pool.A() != future_A
     assert tricrypto_pool.gamma() != future_gamma
 
-    tx = make_vote(
+    vote_id = make_vote(
         target=CURVE_DAO_OWNERSHIP,  # tricrypto-ng factory admin is OWNERSHIP agent
         actions=[parameter_action],
         description="test",
         vote_creator=vote_deployer,
     )
-
-    for log in tx.decode_logs():
-        vote_id = log.event_arguments["voteId"]
-        break
 
     # this advances the chain one week from vote creation
     simulate(
@@ -141,16 +133,12 @@ def test_crypto_factory_commit_parameters(vote_deployer, crypto_factory_pool):
     assert crypto_factory_pool.mid_fee() != new_mid_fee
     assert crypto_factory_pool.out_fee() != new_out_fee
 
-    tx = make_vote(
+    vote_id = make_vote(
         target=CURVE_DAO_PARAM,
         actions=[parameter_action],
         description="test",
         vote_creator=vote_deployer,
     )
-
-    for log in tx.decode_logs():
-        vote_id = log.event_arguments["voteId"]
-        break
 
     # this advances the chain one week from vote creation
     simulate(
@@ -217,16 +205,12 @@ def test_ng_commit_parameters(vote_deployer, tricrypto_pool):
     assert tricrypto_pool.mid_fee() != new_mid_fee
     assert tricrypto_pool.out_fee() != new_out_fee
 
-    tx = make_vote(
+    vote_id = make_vote(
         target=CURVE_DAO_OWNERSHIP,  # tricrypto-ng factory admin is OWNERSHIP agent
         actions=[parameter_action],
         description="test",
         vote_creator=vote_deployer,
     )
-
-    for log in tx.decode_logs():
-        vote_id = log.event_arguments["voteId"]
-        break
 
     # this advances the chain one week from vote creation
     simulate(

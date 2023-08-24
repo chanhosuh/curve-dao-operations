@@ -24,16 +24,12 @@ def addr_to_whitelist():
 def test_whitelist(smartwallet_checker, addr_to_whitelist, vote_deployer):
     assert not smartwallet_checker.check(addr_to_whitelist)
 
-    tx = make_vote(
+    vote_id = make_vote(
         target=CURVE_DAO_OWNERSHIP,
         actions=[whitelist_vecrv_lock(addr_to_whitelist)],
         description="test",
         vote_creator=vote_deployer,
     )
-
-    for log in tx.decode_logs():
-        vote_id = log.event_arguments["voteId"]
-        break
 
     simulate(
         vote_id=vote_id,
@@ -41,4 +37,3 @@ def test_whitelist(smartwallet_checker, addr_to_whitelist, vote_deployer):
     )
 
     assert smartwallet_checker.check(addr_to_whitelist)
-    assert 1 == 1
