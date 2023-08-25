@@ -1,6 +1,7 @@
 import ape
 import pytest
 
+from curve_dao.actions.community_fund import community_fund_action
 from curve_dao.addresses import (
     COMMUNITY_FUND,
     CONTROLLER_FACTORY,
@@ -22,14 +23,8 @@ def test_vest_from_community_fund(community_fund, vote_deployer):
 
     amount = 1_000_000_000000000000000000
     recipient = "0xa2482aA1376BEcCBA98B17578B17EcE82E6D9E86"  # LlamaRisk msig
-    fund_action = (
-        community_fund.address,
-        "deploy_vesting_contract",
-        "0xd533a949740bb3306d119cc777fa900ba034cd52",  # CRV
-        recipient,
-        amount,
-        True,  # allow disable
-        365 * 86400,  # duration; minimum one year
+    fund_action = community_fund_action(
+        recipient, amount, duration=365 * 86400, allow_disable=True
     )
     actions = [fund_action]
 
