@@ -15,19 +15,9 @@ warnings.filterwarnings("ignore")
 RICH_CONSOLE = RichConsole(file=sys.stdout)
 
 
-@click.group(
-    short_help="Curve DAO proposal decoder",
-)
-def cli():
-    """
-    Command-line helper for managing Smartwallet Checker
-    """
-
-
-@cli.command(
+@click.command(
     cls=ape.cli.NetworkBoundCommand,
-    name="decode",
-    short_help="Decode Curve DAO proposal by Vote ID",
+    short_help="Decode Curve DAO proposal by Vote Type and ID",
 )
 @ape.cli.network_option()
 @click.option(
@@ -45,7 +35,7 @@ def cli():
     show_default=True,
     help="Check validity via fork simulation (default is False)",
 )
-def decode(network, vote_type: str, vote_id: int, simulate: bool):
+def cli(network, vote_type: str, vote_id: int, simulate: bool):
 
     RICH_CONSOLE.log(f"Decoding {vote_type} VoteID: {vote_id}")
 
