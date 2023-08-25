@@ -6,7 +6,7 @@ from curve_dao.addresses import (
     CURVE_DAO_OWNERSHIP,
     CURVE_DAO_PARAM,
 )
-from curve_dao.simulate import simulate
+from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import make_vote
 
 
@@ -53,7 +53,7 @@ def test_crypto_factory_ramp_parameters(vote_deployer, crypto_factory_pool):
     )
 
     # this advances the chain one week from vote creation
-    simulate(
+    simulate_vote(
         vote_id=vote_id,
         voting_contract=CURVE_DAO_PARAM["voting"],
     )
@@ -93,7 +93,7 @@ def test_ng_ramp_parameters(vote_deployer, tricrypto_pool):
     )
 
     # this advances the chain one week from vote creation
-    simulate(
+    simulate_vote(
         vote_id=vote_id,
         voting_contract=CURVE_DAO_OWNERSHIP["voting"],
     )
@@ -141,7 +141,7 @@ def test_crypto_factory_commit_parameters(vote_deployer, crypto_factory_pool):
     )
 
     # this advances the chain one week from vote creation
-    simulate(
+    simulate_vote(
         vote_id=vote_id,
         voting_contract=CURVE_DAO_PARAM["voting"],
     )
@@ -213,7 +213,7 @@ def test_ng_commit_parameters(vote_deployer, tricrypto_pool):
     )
 
     # this advances the chain one week from vote creation
-    simulate(
+    simulate_vote(
         vote_id=vote_id,
         voting_contract=CURVE_DAO_OWNERSHIP["voting"],
     )
