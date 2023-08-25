@@ -11,6 +11,8 @@ def simulate(vote_id: int, voting_contract: str):
     logger.info("--------- SIMULATE VOTE ---------")
 
     aragon = ape.project.Voting.at(voting_contract)
+    voter_proxy = ape.accounts[CONVEX_VOTERPROXY]
+    voter_proxy.balance += 10 * 10**18
 
     # print vote details to console first:
     logger.info("Vote stats before Convex Vote:")
