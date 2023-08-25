@@ -6,6 +6,7 @@ from ape.cli.options import _account_callback
 from ape.logging import logger
 
 from curve_dao import make_vote
+from curve_dao.actions.community_fund import community_fund_action
 from curve_dao.actions.kill_gauge import kill_gauge_action
 from curve_dao.actions.whitelist import vecrv_whitelist_action
 from curve_dao.addresses import (
@@ -359,6 +360,79 @@ def pegkeeper_debt_ceiling(
     vote_id = make_vote(
         target=target,
         actions=actions,
+        description=description,
+        vote_creator=account,
+    )
+    logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
+
+    if simulate:
+        script = get_vote_script(vote_id, vote_type)
+        votes = decode_vote_script(script)
+        for vote in votes:
+            formatted_output = vote["formatted_output"]
+            RICH_CONSOLE.log(formatted_output)
+        voting_contract = get_dao_voting_contract(vote_type)
+        simulate_vote(vote_id, voting_contract)
+
+
+@cli.command(
+    cls=ape.cli.NetworkBoundCommand,
+    name="community_fund",
+    short_help="Receive linearly vesting funds from the DAO Community Fund",
+)
+@ape.cli.network_option()
+@ape.cli.account_option()
+@click.option("--recipient", "-r", type=str, required=True, help="Recipient address")
+@click.option(
+    "--amount", "-a", type=int, required=True, help="Amount of CRV (18 decimals)"
+)
+@click.option("--description", "-d", type=str, required=True)
+@click.option(
+    "--duration",
+    type=int,
+    required=False,
+    default=86400 * 365,
+    show_default=True,
+    help="Vesting duration in seconds.  Minimum of 1 year.",
+)
+@click.option(
+    "--allow-disable",
+    type=bool,
+    required=False,
+    default=True,
+    show_default=True,
+    help="Allow DAO to terminate unvested funds.",
+)
+@click.option("--description", "-d", type=str, required=True)
+@click.option(
+    "--simulate",
+    "-s",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Check validity via fork simulation",
+)
+def community_fund(
+    network,
+    account,
+    recipient,
+    amount,
+    description,
+    duration,
+    allow_disable,
+    simulate,
+):
+    if "mainnet-fork" in network:
+        # Override account with a properly setup user
+        logger.info("Using test user account")
+        account = ape.accounts["0x9c5083dd4838E120Dbeac44C052179692Aa5dAC5"]
+
+    vote_type = "ownership"
+    target = select_target(vote_type)
+    fund_action = community_fund_action(recipient, amount, duration, allow_disable)
+    vote_id = make_vote(
+        target=target,
+        actions=[fund_action],
         description=description,
         vote_creator=account,
     )
