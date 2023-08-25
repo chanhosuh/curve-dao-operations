@@ -7,6 +7,7 @@ from ape.logging import logger
 
 from curve_dao import make_vote
 from curve_dao.actions.kill_gauge import kill_gauge_action
+from curve_dao.actions.whitelist import vecrv_whitelist_action
 from curve_dao.addresses import (
     CRYPTOSWAP_FACTORY_OWNER,
     STABLESWAP_FACTORY_OWNER,
@@ -15,7 +16,6 @@ from curve_dao.addresses import (
     get_dao_voting_contract,
     select_target,
 )
-from curve_dao.modules.smartwallet_checker import whitelist_vecrv_lock
 from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import decode_vote_script, get_vote_script
 from scripts.decode import RICH_CONSOLE
@@ -84,7 +84,7 @@ def whitelist(network, account, addr, description, simulate):
     target = get_dao_voting_contract(vote_type)
     vote_id = make_vote(
         target=target,
-        actions=[whitelist_vecrv_lock(addr)],
+        actions=[vecrv_whitelist_action(addr)],
         description=description,
         vote_creator=account,
     )
