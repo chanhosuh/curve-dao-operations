@@ -77,12 +77,11 @@ def make_vote(target: Dict, actions: List[Tuple], description: str, vote_creator
         sender=vote_creator,
     )
 
-    vote_id = None
-    for log in tx.decode_logs():
+    logs = tx.decode_logs()
+    try:
+        log = logs[0]  # should be StartVote
         vote_id = log.event_arguments["voteId"]
-        break
-
-    if not vote_id:
+    except IndexError:
         raise Exception("Vote ID not found.")
 
     return vote_id
