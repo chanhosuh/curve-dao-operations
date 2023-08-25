@@ -1,11 +1,8 @@
 import ape
 import pytest
 
-from curve_dao.addresses import CURVE_DAO_OWNERSHIP
-from curve_dao.modules.smartwallet_checker import (
-    SMARTWALLET_CHECKER,
-    whitelist_vecrv_lock,
-)
+from curve_dao.actions.whitelist import vecrv_whitelist_action
+from curve_dao.addresses import CURVE_DAO_OWNERSHIP, SMARTWALLET_CHECKER, select_target
 from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import make_vote
 
@@ -24,16 +21,18 @@ def addr_to_whitelist():
 def test_whitelist(smartwallet_checker, addr_to_whitelist, vote_deployer):
     assert not smartwallet_checker.check(addr_to_whitelist)
 
+    whitelist_action = vecrv_whitelist_action(addr_to_whitelist)
+    target = select_target("ownership")
     vote_id = make_vote(
-        target=CURVE_DAO_OWNERSHIP,
-        actions=[whitelist_vecrv_lock(addr_to_whitelist)],
+        target=target,
+        actions=[whitelist_action],
         description="test",
         vote_creator=vote_deployer,
     )
 
     simulate_vote(
         vote_id=vote_id,
-        voting_contract=CURVE_DAO_OWNERSHIP["voting"],
+        voting_contract=target["voting"],
     )
 
     assert smartwallet_checker.check(addr_to_whitelist)
