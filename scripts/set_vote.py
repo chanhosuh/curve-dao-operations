@@ -17,7 +17,7 @@ from curve_dao.addresses import (
 from curve_dao.modules.smartwallet_checker import whitelist_vecrv_lock
 from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import decode_vote_script, get_vote_script
-from scripts.decode_executable import RICH_CONSOLE
+from scripts.decode import RICH_CONSOLE
 
 
 # Missing name issue for AccountAliasPromptChoice is not fixed until
@@ -69,9 +69,18 @@ def cli():
 @account_option()
 @click.option("--addr", "-a", type=str, required=True)
 @click.option("--description", "-d", type=str, required=True)
-def whitelist(network, account, addr, description):
+@click.option(
+    "--simulate",
+    "-s",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Check validity via fork simulation (default is False)",
+)
+def whitelist(network, account, addr, description, simulate):
 
-    target = get_dao_voting_contract("ownership")
+    vote_type = "ownership"
+    target = get_dao_voting_contract(vote_type)
     vote_id = make_vote(
         target=target,
         actions=[whitelist_vecrv_lock(addr)],
@@ -79,6 +88,15 @@ def whitelist(network, account, addr, description):
         vote_creator=account,
     )
     logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
+
+    if simulate:
+        script = get_vote_script(vote_id, "ownership")
+        votes = decode_vote_script(script)
+        for vote in votes:
+            formatted_output = vote["formatted_output"]
+            RICH_CONSOLE.log(formatted_output)
+        voting_contract = get_dao_voting_contract(vote_type)
+        simulate_vote(vote_id, voting_contract)
 
 
 @cli.command(
