@@ -6,7 +6,7 @@ from curve_dao.modules.smartwallet_checker import (
     SMARTWALLET_CHECKER,
     whitelist_vecrv_lock,
 )
-from curve_dao.simulate import simulate
+from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import make_vote
 
 
@@ -31,7 +31,7 @@ def test_whitelist(smartwallet_checker, addr_to_whitelist, vote_deployer):
         vote_creator=vote_deployer,
     )
 
-    simulate(
+    simulate_vote(
         vote_id=vote_id,
         voting_contract=CURVE_DAO_OWNERSHIP["voting"],
     )

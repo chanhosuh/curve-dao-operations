@@ -6,7 +6,7 @@ from ape.logging import logger
 from .addresses import CONVEX_VOTERPROXY
 
 
-def simulate(vote_id: int, voting_contract: str):
+def simulate_vote(vote_id: int, voting_contract: str):
     """Simulate passing vote on mainnet-fork"""
     logger.info("--------- SIMULATE VOTE ---------")
 
@@ -21,7 +21,7 @@ def simulate(vote_id: int, voting_contract: str):
 
     # vote
     logger.info("Simulate Convex 'yes' vote")
-    aragon.vote(vote_id, True, False, sender=ape.accounts[CONVEX_VOTERPROXY])
+    aragon.vote(vote_id, True, False, sender=voter_proxy)
 
     # sleep for a week so it has time to pass
     num_seconds = aragon.voteTime()
@@ -34,6 +34,6 @@ def simulate(vote_id: int, voting_contract: str):
 
     # moment of truth - execute the vote!
     logger.info("Simulate proposal execution")
-    enacter = ape.accounts[CONVEX_VOTERPROXY]
+    enacter = voter_proxy
     aragon.executeVote(vote_id, sender=enacter)
     logger.info("Vote Executed!")

@@ -7,7 +7,7 @@ from curve_dao.addresses import (
     STABLESWAP_FACTORY_OWNER,
     STABLESWAP_GAUGE_OWNER,
 )
-from curve_dao.simulate import simulate
+from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import make_vote
 
 
@@ -53,7 +53,7 @@ def test_kill_factory_gauge(vote_deployer, crypto_factory_gauge):
     )
 
     # this advances the chain one week from vote creation
-    simulate(
+    simulate_vote(
         vote_id=vote_id,
         voting_contract=CURVE_DAO_OWNERSHIP["voting"],
     )
@@ -78,7 +78,7 @@ def test_kill_ng_gauge(vote_deployer, tricrypto_ng_gauge):
     )
 
     # this advances the chain one week from vote creation
-    simulate(
+    simulate_vote(
         vote_id=vote_id,
         voting_contract=CURVE_DAO_OWNERSHIP["voting"],
     )
@@ -104,7 +104,7 @@ def test_kill_stableswap_gauge(vote_deployer, stableswap_gauge):
     )
 
     # this advances the chain one week from vote creation
-    simulate(
+    simulate_vote(
         vote_id=vote_id,
         voting_contract=CURVE_DAO_OWNERSHIP["voting"],
     )
@@ -130,7 +130,7 @@ def test_kill_stableswap_factory_gauge(vote_deployer, stableswap_factory_gauge):
     )
 
     # this advances the chain one week from vote creation
-    simulate(
+    simulate_vote(
         vote_id=vote_id,
         voting_contract=CURVE_DAO_OWNERSHIP["voting"],
     )
