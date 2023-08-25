@@ -9,6 +9,7 @@ from curve_dao import make_vote
 from curve_dao.actions.kill_gauge import kill_gauge_action
 from curve_dao.actions.whitelist import vecrv_whitelist_action
 from curve_dao.addresses import (
+    CONTROLLER_FACTORY,
     CRYPTOSWAP_FACTORY_OWNER,
     STABLESWAP_FACTORY_OWNER,
     STABLESWAP_GAUGE_OWNER,
@@ -309,50 +310,50 @@ def change_parameters(
 @ape.cli.network_option()
 @ape.cli.account_option()
 @click.option("--address", "-a", type=str, required=True, help="Pegkeeper address")
-@click.option("--ceiling", "-c", type=str, required=True, help="New debt ceiling")
+@click.option("--ceiling", "-c", type=int, required=True, help="New debt ceiling")
 @click.option("--description", "-d", type=str, required=True)
+@click.option(
+    "--simulate",
+    "-s",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Check validity via fork simulation (default is False)",
+)
 def pegkeeper_debt_ceiling(
     network,
     account,
     address,
     ceiling,
     description,
+    simulate,
 ):
     """
     ape run pegkeeper_debt_ceiling --account <account index or alias> --network <network>
     """
-
-    # Controller factory
-    factory_address = "0xC9332fdCB1C491Dcc683bAe86Fe3cb70360738BC"
-    # TUSD peg keeper
-    pegkeeper_address = "0x1ef89ed0edd93d1ec09e4c07373f69c49f4dccae"
-    # pegkeeper_address = address
-    # current debt ceiling: 25000000000000000000000000
-    new_debt_ceiling = 1_000_000_000000000000000000
-    description = "fill this in!"
+    pegkeeper_address = address
 
     if "mainnet-fork" in network:
         # Override account with a properly setup user
         logger.info("Using test user account")
         account = ape.accounts["0x9c5083dd4838E120Dbeac44C052179692Aa5dAC5"]
 
-    factory = ape.Contract(factory_address)
-    current_ceiling = factory.debt_ceiling(pegkeeper_address)
-    assert current_ceiling != ceiling, "New debt ceiling is the same as current value"
-
-    target = select_target("ownership")
+    vote_type = "ownership"
+    target = select_target(vote_type)
 
     set_ceiling_action = (
-        factory_address,
+        CONTROLLER_FACTORY,
         "set_debt_ceiling",
-        pegkeeper_address,
-        new_debt_ceiling,
+        address,
+        ceiling,
     )
     actions = [set_ceiling_action]
 
     # burn excess crvUSD
+    factory = ape.Contract(CONTROLLER_FACTORY)
+    current_ceiling = factory.debt_ceiling(pegkeeper_address)
     if ceiling < current_ceiling:
-        burn_action = (factory_address, "rug_debt_ceiling", pegkeeper_address)
+        burn_action = (factory.address, "rug_debt_ceiling", pegkeeper_address)
         actions.append(burn_action)
 
     vote_id = make_vote(
@@ -363,10 +364,11 @@ def pegkeeper_debt_ceiling(
     )
     logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
 
-    # For testing, since malformed script can be set in vote, we need to
-    # execute to double-check everything really works.
-    voting_contract = get_dao_voting_contract("ownership")
-    simulate_vote(vote_id, voting_contract)
-    assert (
-        factory.debt_ceiling(pegkeeper_address) == new_debt_ceiling
-    ), "Debt ceiling doesn't match expected new value."
+    if simulate:
+        script = get_vote_script(vote_id, vote_type)
+        votes = decode_vote_script(script)
+        for vote in votes:
+            formatted_output = vote["formatted_output"]
+            RICH_CONSOLE.log(formatted_output)
+        voting_contract = get_dao_voting_contract(vote_type)
+        simulate_vote(vote_id, voting_contract)
