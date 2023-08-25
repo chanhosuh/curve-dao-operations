@@ -104,6 +104,14 @@ def whitelist(network, account, addr, description):
     required=True,
 )
 @click.option("--description", "-d", type=str, required=True)
+@click.option(
+    "--simulate",
+    "-s",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Check validity via fork simulation (default is False)",
+)
 def kill_gauge(
     network,
     account,
@@ -111,6 +119,7 @@ def kill_gauge(
     kill,
     gauge_type,
     description,
+    simulate,
 ):
     """
     ape run set_vote kill_gauge --address 0x762648808ef8b25c6d92270b1c84ec97df3bed6b --gauge-type crypto_factory -d 'Kill the whatever gauge'  --account test_account --network :mainnet-fork
@@ -155,7 +164,8 @@ def kill_gauge(
             kill,
         )
 
-    target = select_target("ownership")
+    vote_type = "ownership"
+    target = select_target(vote_type)
     vote_id = make_vote(
         target=target,
         actions=[kill_action],
@@ -164,11 +174,14 @@ def kill_gauge(
     )
     logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
 
-    script = get_vote_script(vote_id, "ownership")
-    votes = decode_vote_script(script)
-    for vote in votes:
-        formatted_output = vote["formatted_output"]
-        RICH_CONSOLE.log(formatted_output)
+    if simulate:
+        script = get_vote_script(vote_id, "ownership")
+        votes = decode_vote_script(script)
+        for vote in votes:
+            formatted_output = vote["formatted_output"]
+            RICH_CONSOLE.log(formatted_output)
+        voting_contract = get_dao_voting_contract(vote_type)
+        simulate_vote(vote_id, voting_contract)
 
 
 @cli.command(
