@@ -5,7 +5,9 @@ import ape
 import click
 from rich.console import Console as RichConsole
 
+from curve_dao.addresses import get_dao_voting_contract
 from curve_dao.ipfs import get_description_from_vote_id
+from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import decode_vote_script, get_vote_script
 
 warnings.filterwarnings("ignore")
@@ -35,7 +37,15 @@ def cli():
     required=True,
 )
 @click.option("--vote-id", "-v", type=int, default=0)
-def decode(network, vote_type: str, vote_id: int):
+@click.option(
+    "--simulate",
+    "-s",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Check validity via fork simulation (default is False)",
+)
+def decode(network, vote_type: str, vote_id: int, simulate: bool):
 
     RICH_CONSOLE.log(f"Decoding {vote_type} VoteID: {vote_id}")
 
@@ -52,3 +62,7 @@ def decode(network, vote_type: str, vote_id: int):
     for vote in votes:
         formatted_output = vote["formatted_output"]
         RICH_CONSOLE.log(formatted_output)
+
+    if simulate:
+        voting_contract = get_dao_voting_contract(vote_type)
+        simulate_vote(vote_id, voting_contract)

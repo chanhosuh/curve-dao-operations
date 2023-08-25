@@ -15,7 +15,7 @@ from curve_dao.addresses import (
     select_target,
 )
 from curve_dao.modules.smartwallet_checker import whitelist_vecrv_lock
-from curve_dao.simulate import simulate
+from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import decode_vote_script, get_vote_script
 from scripts.decode_executable import RICH_CONSOLE
 
@@ -369,7 +369,7 @@ def pegkeeper_debt_ceiling(
     # For testing, since malformed script can be set in vote, we need to
     # execute to double-check everything really works.
     voting_contract = get_dao_voting_contract("ownership")
-    simulate(vote_id, voting_contract)
+    simulate_vote(vote_id, voting_contract)
     assert (
         factory.debt_ceiling(pegkeeper_address) == new_debt_ceiling
     ), "Debt ceiling doesn't match expected new value."
