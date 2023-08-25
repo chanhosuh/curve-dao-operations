@@ -35,5 +35,9 @@ def simulate_vote(vote_id: int, voting_contract: str):
     # moment of truth - execute the vote!
     logger.info("Simulate proposal execution")
     enacter = voter_proxy
-    aragon.executeVote(vote_id, sender=enacter)
+    tx = aragon.executeVote(vote_id, sender=enacter)
     logger.info("Vote Executed!")
+
+    # Return the transaction.
+    # This lets us search event logs and assert things.
+    return tx

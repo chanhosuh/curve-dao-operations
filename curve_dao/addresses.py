@@ -38,6 +38,9 @@ SMARTWALLET_CHECKER = "0xca719728Ef172d0961768581fdF35CB116e0B7a4"
 # crvUSD controller factory
 CONTROLLER_FACTORY = "0xC9332fdCB1C491Dcc683bAe86Fe3cb70360738BC"
 
+# Community Fund
+COMMUNITY_FUND = "0xe3997288987E6297Ad550A69B31439504F513267"
+
 
 def get_dao_voting_contract(vote_type: str):
     target = select_target(vote_type)
