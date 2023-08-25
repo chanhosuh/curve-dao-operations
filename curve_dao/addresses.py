@@ -35,6 +35,9 @@ STABLESWAP_GAUGE_OWNER = "0x519AFB566c05E00cfB9af73496D00217A630e4D5"
 # checks if smart contract is whitelisted for veCRV
 SMARTWALLET_CHECKER = "0xca719728Ef172d0961768581fdF35CB116e0B7a4"
 
+# crvUSD controller factory
+CONTROLLER_FACTORY = "0xC9332fdCB1C491Dcc683bAe86Fe3cb70360738BC"
+
 
 def get_dao_voting_contract(vote_type: str):
     target = select_target(vote_type)
