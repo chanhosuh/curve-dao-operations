@@ -60,7 +60,7 @@ def make_vote(target: Dict, actions: List[Tuple], description: str, vote_creator
     assert aragon.canCreateNewVote(vote_creator), "dev: user cannot create new vote"
 
     evm_script = prepare_vote_script(target, actions)
-    logger.info(f"EVM script: {evm_script}")
+    logger.debug(f"EVM script: {evm_script}")
 
     ipfs_hash = get_ipfs_hash_from_description(description)
     tx = aragon.newVote(

@@ -15,9 +15,9 @@ def simulate_vote(vote_id: int, voting_contract: str):
     voter_proxy.balance += 10 * 10**18
 
     # print vote details to console first:
-    logger.info("Vote stats before Convex Vote:")
+    logger.debug("Vote stats before Convex Vote:")
     vote_stats = aragon.getVote(vote_id)
-    logger.info(pprint.pformat(vote_stats, indent=4))
+    logger.debug(pprint.pformat(vote_stats, indent=4))
 
     # vote
     logger.info("Simulate Convex 'yes' vote")
@@ -28,9 +28,9 @@ def simulate_vote(vote_id: int, voting_contract: str):
     ape.chain.mine(deltatime=num_seconds)
 
     # get vote stats:
-    logger.info("Vote stats after 1 week:")
+    logger.debug("Vote stats after 1 week:")
     vote_stats = aragon.getVote(vote_id)
-    logger.info(pprint.pformat(vote_stats, indent=4))
+    logger.debug(pprint.pformat(vote_stats, indent=4))
 
     # moment of truth - execute the vote!
     logger.info("Simulate proposal execution")
