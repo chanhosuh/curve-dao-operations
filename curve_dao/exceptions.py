@@ -1,0 +1,2 @@
+class CurveDaoOperationsError(RuntimeError):
+    pass

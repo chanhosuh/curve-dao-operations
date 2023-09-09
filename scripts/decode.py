@@ -8,20 +8,17 @@ import click
 from rich.console import Console as RichConsole
 
 from curve_dao.addresses import get_dao_voting_contract
+from curve_dao.exceptions import CurveDaoOperationsError
 from curve_dao.ipfs import get_description_from_vote_id
 from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import decode_vote_script, get_vote_script
 
+try:
+    WEB3_ALCHEMY_PROJECT_ID = os.environ["WEB3_ALCHEMY_PROJECT_ID"]
+except KeyError:
+    raise CurveDaoOperationsError("Cannot find WEB3_ALCHEMY_PROJECT_ID in env.")
 
-class CurveDaoOperationsError(RuntimeError):
-    pass
-
-
-WEB3_ALCHEMY_PROJECT_ID = os.getenv("WEB3_ALCHEMY_PROJECT_ID")
-if not WEB3_ALCHEMY_PROJECT_ID:
-    raise CurveDaoOperationsError("Cannot find Alchemy Project ID in env.")
-
-boa.env.fork(url="https://eth-mainnet.alchemyapi.io/v2/WEB3_ALCHEMY_PROJECT_ID")
+boa.env.fork(url=f"https://eth-mainnet.alchemyapi.io/v2/{WEB3_ALCHEMY_PROJECT_ID}")
 
 warnings.filterwarnings("ignore")
 
