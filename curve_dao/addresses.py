@@ -1,3 +1,5 @@
+from curve_dao.exceptions import CurveDaoOperationsError
+
 CURVE_DAO_OWNERSHIP = {
     "agent": "0x40907540d8a6C65c637785e8f8B742ae6b0b9968",
     "voting": "0xE478de485ad2fe566d49342Cbd03E49ed7DB3356",
@@ -48,11 +50,11 @@ def get_dao_voting_contract(vote_type: str):
 
 
 def select_target(vote_type: str):
+    if vote_type == "ownership":
+        return CURVE_DAO_OWNERSHIP
+    if vote_type == "parameter":
+        return CURVE_DAO_PARAM
+    if vote_type == "emergency":
+        return EMERGENCY_DAO
 
-    match vote_type:
-        case "ownership":
-            return CURVE_DAO_OWNERSHIP
-        case "parameter":
-            return CURVE_DAO_PARAM
-        case "emergency":
-            return EMERGENCY_DAO
+    raise CurveDaoOperationsError(f"Vote type not recognized: {vote_type}")
