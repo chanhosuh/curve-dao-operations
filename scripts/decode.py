@@ -1,7 +1,9 @@
+import os
 import sys
 import warnings
 
-import ape
+# import ape
+import boa
 import click
 from rich.console import Console as RichConsole
 
@@ -10,16 +12,27 @@ from curve_dao.ipfs import get_description_from_vote_id
 from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import decode_vote_script, get_vote_script
 
+
+class CurveDaoOperationsError(RuntimeError):
+    pass
+
+
+WEB3_ALCHEMY_PROJECT_ID = os.getenv("WEB3_ALCHEMY_PROJECT_ID")
+if not WEB3_ALCHEMY_PROJECT_ID:
+    raise CurveDaoOperationsError("Cannot find Alchemy Project ID in env.")
+
+boa.env.fork(url="https://eth-mainnet.alchemyapi.io/v2/WEB3_ALCHEMY_PROJECT_ID")
+
 warnings.filterwarnings("ignore")
 
 RICH_CONSOLE = RichConsole(file=sys.stdout)
 
 
 @click.command(
-    cls=ape.cli.NetworkBoundCommand,
+    # cls=ape.cli.NetworkBoundCommand,
     short_help="Decode Curve DAO proposal by Vote Type and ID",
 )
-@ape.cli.network_option()
+# @ape.cli.network_option()
 @click.option(
     "--vote-type",
     "-t",
@@ -35,7 +48,7 @@ RICH_CONSOLE = RichConsole(file=sys.stdout)
     show_default=True,
     help="Check validity via fork simulation (default is False)",
 )
-def cli(network, vote_type: str, vote_id: int, simulate: bool):
+def cli(vote_type: str, vote_id: int, simulate: bool):
 
     RICH_CONSOLE.log(f"Decoding {vote_type} VoteID: {vote_id}")
 

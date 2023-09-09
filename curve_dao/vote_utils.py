@@ -3,7 +3,8 @@ __all__ = ["make_vote", "prepare_vote_script", "get_vote_script", "decode_vote_s
 import warnings
 from typing import Dict, List, Tuple
 
-import ape
+# import ape
+import boa
 from ape.logging import logger
 
 from .addresses import get_dao_voting_contract
@@ -83,7 +84,10 @@ def make_vote(target: Dict, actions: List[Tuple], description: str, vote_creator
 
 def get_vote_script(vote_id: str, vote_type: str) -> str:
     voting_contract_address = get_dao_voting_contract(vote_type)
-    voting_contract = ape.project.Voting.at(voting_contract_address)
+    # voting_contract = ape.project.Voting.at(voting_contract_address)
+    abi_path = "./contracts/aragon_intefaces/Voting.json"
+    voting_contract = boa.load_abi(abi_path).at(voting_contract_address)
+
     vote = voting_contract.getVote(vote_id)
     script = vote["script"]
     return script
