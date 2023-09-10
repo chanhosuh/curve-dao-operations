@@ -43,21 +43,6 @@ def decode_calldata(
 
 
 def decode_value(value):
-    if isinstance(value, bytes):
-        try:
-            string_value = value.strip(b"\x00").decode("utf8")
-            return f"'{string_value}'"
-        except UnicodeDecodeError:
-            # Truncate bytes if very long.
-            if len(value) > 24:
-                return humanize_hash(value)
-
-            hex_str = value.hex()
-            if is_hex_address(hex_str):
-                return decode_value(hex_str)
-
-            return hex_str
-
     if isinstance(value, str) and is_hex_address(value):
         return to_checksum_address(value)
 
