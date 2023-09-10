@@ -13,11 +13,9 @@ from .decoder_utils import decode_input
 
 # from .ipfs import get_ipfs_hash_from_description
 
-# from ape.logging import logger
 
 
 
-# warnings.filterwarnings("ignore")
 
 
 def prepare_vote_script(target: Dict, actions: List[Tuple]) -> str:
