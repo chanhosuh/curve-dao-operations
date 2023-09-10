@@ -7,50 +7,10 @@ from eth_abi.exceptions import InsufficientDataBytes
 from eth_hash.auto import keccak
 from eth_utils import humanize_hash, is_hex_address, to_checksum_address
 
-# from ethpm_types import HexBytes
-# from ethpm_types.abi import MethodABI
-
 try:
     from eth_abi import decode_abi
 except ImportError:
     from eth_abi import decode as decode_abi
-
-
-def get_type_strings(abi_params: List, substitutions: Optional[Dict] = None) -> List:
-    types_list = []
-    if substitutions is None:
-        substitutions = {}
-
-    for i in abi_params:
-        if i.type.startswith("tuple"):
-            params = get_type_strings(i.components, substitutions)
-            array_size = i.type[5:]
-            types_list.append(f"({','.join(params)}){array_size}")
-        else:
-            type_str = i.type
-            for orig, sub in substitutions.items():
-                if type_str.startswith(orig):
-                    type_str = type_str.replace(orig, sub)
-            types_list.append(type_str)
-
-    return types_list
-
-
-def build_function_signature(abi: Dict) -> str:
-    types_list = get_type_strings(abi.inputs)
-    return f"{abi.name}({','.join(types_list)})"
-
-
-def build_function_selector(abi: Dict) -> str:
-    sig = build_function_signature(abi)
-    return "0x" + keccak(sig.encode()).hex()[:8]
-
-
-def decode_address(raw_address):
-    if isinstance(raw_address, int):
-        raw_address = HexBytes(raw_address)
-
-    return to_checksum_address(raw_address)
 
 
 def decode_value(value):
@@ -70,7 +30,7 @@ def decode_value(value):
     #         return hex_str
 
     if isinstance(value, str) and is_hex_address(value):
-        return decode_address(value)
+        return to_checksum_address(value)
 
     elif value and isinstance(value, str):
         # Surround non-address strings with quotes.
@@ -88,40 +48,33 @@ def decode_value(value):
 
 
 def decode_calldata(
-    method,
+    abi_entry,
     raw_data: bytes,
 ) -> List:
-    input_types = [i['type'] for i in method['inputs']]  # type: ignore
+    input_types = [i['type'] for i in abi_entry['inputs']]
 
     try:
-
         raw_input_values = decode_abi(input_types, raw_data)
         input_values = [decode_value(v) for v in raw_input_values]
-
-    # except (DecodingError, InsufficientDataBytes):
     except InsufficientDataBytes:
-
         input_values = ["<?>" for _ in input_types]
 
     return input_values
 
 
 def decode_input(abi_with_4bytes, calldata: Union[str, bytes]) -> Tuple[str, Any]:
+    selector = calldata[:4].hex()
+    raw_data = calldata[4:]
 
-    # if not isinstance(calldata, HexBytes):
-    #     calldata = HexBytes(calldata)
-
-    fn_selector = calldata[:4].hex()  # type: ignore
-    abi = next(
-        (
-            entry
-            for entry in abi_with_4bytes
-            if entry["4bytes"] == fn_selector
-        ),
-        None,
-    )
+    abi = None
+    for entry in abi_with_4bytes:
+        if entry["4bytes"] == selector:
+            abi = entry
 
     if abi is None:
-        raise ValueError("Four byte selector does not match the ABI for this contract")
+        raise ValueError(
+            "Four byte selector does not match the ABI for this contract"
+        )
 
-    return abi, decode_calldata(abi, calldata[4:])
+    decoded_data = decode_calldata(abi, raw_data)
+    return abi, decoded_data

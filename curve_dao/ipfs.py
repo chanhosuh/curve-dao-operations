@@ -59,7 +59,7 @@ def get_description_from_ipfs_hash(ipfs_hash: str):
 def get_ipfs_hash_from_vote_id(vote_type, vote_id):
     voting_contract_address = get_dao_voting_contract(vote_type)
     # voting_contract = ape.project.Voting.at(voting_contract_address)
-    voting_contract = get_contract(voting_contract_address)
+    voting_contract, _ = get_contract(voting_contract_address)
     vote = voting_contract.getVote(vote_id)
     # open, executed, startDate, snapshotBlock, supportRequired,
     # minAcceptQuorum, yea, nay, votingPower, script

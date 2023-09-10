@@ -91,14 +91,18 @@ def make_vote(target: Dict, actions: List[Tuple], description: str, vote_creator
     return vote_id
 
 
-def get_vote_script(vote_id: str, vote_type: str) -> str:
+def get_voting_contract(vote_type: str):
     voting_contract_address = get_dao_voting_contract(vote_type)
-    # voting_contract = ape.project.Voting.at(voting_contract_address)
     abi_path = "./contracts/aragon_interfaces/Voting_vyper.json"
     voting_contract = boa.load_abi(abi_path).at(voting_contract_address)
+    return voting_contract
 
+
+def get_vote_script(vote_id: str, vote_type: str) -> str:
+    voting_contract = get_voting_contract(vote_type)
     vote = voting_contract.getVote(vote_id)
-    # script = vote["script"]
+    # open, executed, startDate, snapshotBlock, supportRequired,
+    # minAcceptQuorum, yea, nay, votingPower, script
     script = vote[9]
     return script
 

@@ -24,6 +24,7 @@ warnings.filterwarnings("ignore")
 
 RICH_CONSOLE = RichConsole(file=sys.stdout)
 
+
 @click.command(
     # cls=ape.cli.NetworkBoundCommand,
     short_help="Decode Curve DAO proposal by Vote Type and ID",
