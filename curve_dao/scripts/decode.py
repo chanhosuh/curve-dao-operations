@@ -2,7 +2,6 @@ import os
 import sys
 import warnings
 
-# import ape
 import boa
 import click
 from rich.console import Console as RichConsole
@@ -22,14 +21,12 @@ boa.env.fork(url=f"https://eth-mainnet.alchemyapi.io/v2/{WEB3_ALCHEMY_PROJECT_ID
 
 warnings.filterwarnings("ignore")
 
-RICH_CONSOLE = RichConsole(file=sys.stdout)
+console = RichConsole(file=sys.stdout)
 
 
 @click.command(
-    # cls=ape.cli.NetworkBoundCommand,
     short_help="Decode Curve DAO proposal by Vote Type and ID",
 )
-# @ape.cli.network_option()
 @click.option(
     "--vote-type",
     "-t",
@@ -47,22 +44,22 @@ RICH_CONSOLE = RichConsole(file=sys.stdout)
 )
 def cli(vote_type: str, vote_id: int, simulate: bool):
 
-    RICH_CONSOLE.log(f"Decoding {vote_type} VoteID: {vote_id}")
+    console.log(f"Decoding {vote_type} VoteID: {vote_id}")
 
     # get script from voting data:
     script = get_vote_script(vote_id, vote_type)
     if not script:
-        RICH_CONSOLE.log("[red] VoteID not found in any DAO voting contract [/red]")
+        console.log("[red] VoteID not found in any DAO voting contract [/red]")
         return
 
     # FIXME: need to retrieve the event data using web3 or something like that
     # description = get_description_from_vote_id(vote_id, vote_type)
-    # RICH_CONSOLE.log(description)
+    # console.log(description)
 
     votes = decode_vote_script(script)
     for vote in votes:
         formatted_output = vote["formatted_output"]
-        RICH_CONSOLE.log(formatted_output)
+        console.log(formatted_output)
 
     if simulate:
         voting_contract = get_dao_voting_contract(vote_type)
