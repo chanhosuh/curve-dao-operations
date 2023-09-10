@@ -60,13 +60,17 @@ def get_contract_abi_json(contract_address):
                 if _input['name'] in ['from']:
                     skip = True
                     break
-        # vote id 351
-        # if 'outputs' in entry:
-        #     outputs = entry['outputs']
-        #     for output in outputs:
-        #         if output['type'] == 'tuple':
-        #             skip = True
-        #             break
+        if 'outputs' in entry:
+            outputs = entry['outputs']
+            for output in outputs:
+                # ownership vote id 351, several more
+                # if output['type'] == 'tuple':
+                #     skip = True
+                #     break
+                if output['type'] == 'tuple[]':
+                    skip=True
+                    break
+        # ownership vote id 394: vyper.exceptions.StructureException: '' contains invalid character(s)
         if skip:
             skip = False
             continue
