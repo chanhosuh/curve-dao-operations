@@ -15,7 +15,7 @@ from curve_dao.vote_utils import make_vote
 @pytest.fixture(scope="module")
 def crypto_factory_gauge():
     # JPEGpETH gauge
-    yield ape.Contract("0x762648808ef8b25c6d92270b1c84ec97df3bed6b")
+    yield ape.Contract("0x839d92046f1e62a51a2b5705ecae41df152545ec")
 
 
 @pytest.fixture(scope="module")
