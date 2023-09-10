@@ -1,44 +1,48 @@
 import pprint
+import sys
+
+import boa
+from rich.console import Console as RichConsole
+
+from curve_dao.contract import get_contract
 
 from .addresses import CONVEX_VOTERPROXY
 
-# import ape
-# from ape.logging import logger
+console = RichConsole(file=sys.stdout)
 
 
-
-def simulate_vote(vote_id: int, voting_contract: str):
+def simulate_vote(vote_id: int, voting_contract: str, debug=False):
     """Simulate passing vote on mainnet-fork"""
-    logger.info("--------- SIMULATE VOTE ---------")
+    console.log("--------- SIMULATE VOTE ---------")
 
     # aragon = ape.project.Voting.at(voting_contract)
-    aragon = get_contract(voting_contract)
-    voter_proxy = ape.accounts[CONVEX_VOTERPROXY]
-    voter_proxy.balance += 10 * 10**18
+    aragon, _ = get_contract(voting_contract)
+    boa.env.set_balance(CONVEX_VOTERPROXY, 10 * 10**18)
 
-    # print vote details to console first:
-    logger.debug("Vote stats before Convex Vote:")
-    vote_stats = aragon.getVote(vote_id)
-    logger.debug(pprint.pformat(vote_stats, indent=4))
+    if debug:
+        console.log("Vote stats before Convex Vote:")
+        vote_stats = aragon.getVote(vote_id)
+        console.log(pprint.pformat(vote_stats, indent=4))
 
     # vote
-    logger.info("Simulate Convex 'yes' vote")
-    aragon.vote(vote_id, True, False, sender=voter_proxy)
+    console.log("Simulate Convex 'yes' vote")
+    with boa.env.prank(CONVEX_VOTERPROXY):
+        aragon.vote(vote_id, True, False)
 
     # sleep for a week so it has time to pass
     num_seconds = aragon.voteTime()
-    ape.chain.mine(deltatime=num_seconds)
+    boa.env.time_travel(seconds=num_seconds)
 
-    # get vote stats:
-    logger.debug("Vote stats after 1 week:")
-    vote_stats = aragon.getVote(vote_id)
-    logger.debug(pprint.pformat(vote_stats, indent=4))
+    if debug:
+        console.log("Vote stats after 1 week:")
+        vote_stats = aragon.getVote(vote_id)
+        console.log(pprint.pformat(vote_stats, indent=4))
 
     # moment of truth - execute the vote!
-    logger.info("Simulate proposal execution")
-    enacter = voter_proxy
-    tx = aragon.executeVote(vote_id, sender=enacter)
-    logger.info("Vote Executed!")
+    console.log("Simulate proposal execution")
+    with boa.env.prank(CONVEX_VOTERPROXY):
+        tx = aragon.executeVote(vote_id)
+    console.log("Vote Executed!")
 
     # Return the transaction.
     # This lets us search event logs and assert things.

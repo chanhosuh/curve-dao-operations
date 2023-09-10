@@ -63,7 +63,9 @@ def cli(vote_type: str, vote_id: int, simulate: bool):
 
     if simulate:
         voting_contract = get_dao_voting_contract(vote_type)
-        simulate_vote(vote_id, voting_contract)
+        tx = simulate_vote(vote_id, voting_contract)
+        # logs = tx.decode_logs()
+        # print(logs)
 
 
 if __name__ == '__main__':
