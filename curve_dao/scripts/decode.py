@@ -24,7 +24,6 @@ warnings.filterwarnings("ignore")
 
 RICH_CONSOLE = RichConsole(file=sys.stdout)
 
-
 @click.command(
     # cls=ape.cli.NetworkBoundCommand,
     short_help="Decode Curve DAO proposal by Vote Type and ID",
@@ -36,7 +35,7 @@ RICH_CONSOLE = RichConsole(file=sys.stdout)
     type=click.Choice(["ownership", "parameter"]),
     required=True,
 )
-@click.option("--vote-id", "-v", type=int, default=0)
+@click.option("--vote-id", "-v", type=int, required=True)
 @click.option(
     "--simulate",
     "-s",
@@ -55,8 +54,9 @@ def cli(vote_type: str, vote_id: int, simulate: bool):
         RICH_CONSOLE.log("[red] VoteID not found in any DAO voting contract [/red]")
         return
 
-    description = get_description_from_vote_id(vote_id, vote_type)
-    RICH_CONSOLE.log(description)
+    # FIXME: need to retrieve the event data using web3 or something like that
+    # description = get_description_from_vote_id(vote_id, vote_type)
+    # RICH_CONSOLE.log(description)
 
     votes = decode_vote_script(script)
     for vote in votes:
@@ -66,3 +66,7 @@ def cli(vote_type: str, vote_id: int, simulate: bool):
     if simulate:
         voting_contract = get_dao_voting_contract(vote_type)
         simulate_vote(vote_id, voting_contract)
+
+
+if __name__ == '__main__':
+    cli()

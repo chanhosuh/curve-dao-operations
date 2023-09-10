@@ -1,13 +1,14 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-import ape
-from ape.exceptions import DecodingError
-from ape.utils.abi import Struct
+# import ape
+# from ape.exceptions import DecodingError
+# from ape.utils.abi import Struct
 from eth_abi.exceptions import InsufficientDataBytes
 from eth_hash.auto import keccak
 from eth_utils import humanize_hash, is_hex_address, to_checksum_address
-from ethpm_types import HexBytes
-from ethpm_types.abi import MethodABI
+
+# from ethpm_types import HexBytes
+# from ethpm_types.abi import MethodABI
 
 try:
     from eth_abi import decode_abi
@@ -53,22 +54,22 @@ def decode_address(raw_address):
 
 
 def decode_value(value):
-    if isinstance(value, HexBytes):
-        try:
-            string_value = value.strip(b"\x00").decode("utf8")
-            return f"'{string_value}'"
-        except UnicodeDecodeError:
-            # Truncate bytes if very long.
-            if len(value) > 24:
-                return humanize_hash(value)
+    # if isinstance(value, HexBytes):
+    #     try:
+    #         string_value = value.strip(b"\x00").decode("utf8")
+    #         return f"'{string_value}'"
+    #     except UnicodeDecodeError:
+    #         # Truncate bytes if very long.
+    #         if len(value) > 24:
+    #             return humanize_hash(value)
 
-            hex_str = HexBytes(value).hex()
-            if is_hex_address(hex_str):
-                return decode_value(hex_str)
+    #         hex_str = HexBytes(value).hex()
+    #         if is_hex_address(hex_str):
+    #             return decode_value(hex_str)
 
-            return hex_str
+    #         return hex_str
 
-    elif isinstance(value, str) and is_hex_address(value):
+    if isinstance(value, str) and is_hex_address(value):
         return decode_address(value)
 
     elif value and isinstance(value, str):
@@ -79,44 +80,43 @@ def decode_value(value):
         decoded_values = [decode_value(v) for v in value]
         return decoded_values
 
-    elif isinstance(value, Struct):
-        decoded_values = {k: decode_value(v) for k, v in value.items()}
-        return decoded_values
+    # elif isinstance(value, Struct):
+    #     decoded_values = {k: decode_value(v) for k, v in value.items()}
+    #     return decoded_values
 
     return value
 
 
 def decode_calldata(
-    method: MethodABI,
+    method,
     raw_data: bytes,
 ) -> List:
-    input_types = [i.canonical_type for i in method.inputs]  # type: ignore
+    input_types = [i['type'] for i in method['inputs']]  # type: ignore
 
     try:
 
         raw_input_values = decode_abi(input_types, raw_data)
         input_values = [decode_value(v) for v in raw_input_values]
 
-    except (DecodingError, InsufficientDataBytes):
+    # except (DecodingError, InsufficientDataBytes):
+    except InsufficientDataBytes:
 
         input_values = ["<?>" for _ in input_types]
 
     return input_values
 
 
-def decode_input(
-    contract: ape.Contract, calldata: Union[str, bytes]
-) -> Tuple[str, Any]:
+def decode_input(abi_with_4bytes, calldata: Union[str, bytes]) -> Tuple[str, Any]:
 
-    if not isinstance(calldata, HexBytes):
-        calldata = HexBytes(calldata)
+    # if not isinstance(calldata, HexBytes):
+    #     calldata = HexBytes(calldata)
 
     fn_selector = calldata[:4].hex()  # type: ignore
     abi = next(
         (
-            i
-            for i in contract.contract_type.abi
-            if i.type == "function" and build_function_selector(i) == fn_selector
+            entry
+            for entry in abi_with_4bytes
+            if entry["4bytes"] == fn_selector
         ),
         None,
     )

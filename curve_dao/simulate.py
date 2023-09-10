@@ -1,16 +1,18 @@
 import pprint
 
-import ape
-from ape.logging import logger
-
 from .addresses import CONVEX_VOTERPROXY
+
+# import ape
+# from ape.logging import logger
+
 
 
 def simulate_vote(vote_id: int, voting_contract: str):
     """Simulate passing vote on mainnet-fork"""
     logger.info("--------- SIMULATE VOTE ---------")
 
-    aragon = ape.project.Voting.at(voting_contract)
+    # aragon = ape.project.Voting.at(voting_contract)
+    aragon = get_contract(voting_contract)
     voter_proxy = ape.accounts[CONVEX_VOTERPROXY]
     voter_proxy.balance += 10 * 10**18
 

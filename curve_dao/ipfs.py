@@ -1,8 +1,10 @@
 import json
 import os
 
-import ape
+# import ape
 import requests
+
+from curve_dao.contract import get_contract
 
 from .addresses import get_dao_voting_contract
 
@@ -56,8 +58,12 @@ def get_description_from_ipfs_hash(ipfs_hash: str):
 
 def get_ipfs_hash_from_vote_id(vote_type, vote_id):
     voting_contract_address = get_dao_voting_contract(vote_type)
-    voting_contract = ape.project.Voting.at(voting_contract_address)
-    snapshot_block = voting_contract.getVote(vote_id)["snapshotBlock"]
+    # voting_contract = ape.project.Voting.at(voting_contract_address)
+    voting_contract = get_contract(voting_contract_address)
+    vote = voting_contract.getVote(vote_id)
+    # open, executed, startDate, snapshotBlock, supportRequired,
+    # minAcceptQuorum, yea, nay, votingPower, script
+    snapshot_block = vote[3]
     vote_events = voting_contract.StartVote.query(
         "voteId",
         "metadata",
