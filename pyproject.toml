@@ -59,7 +59,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["curve_dao*"]
+include = ["curve_dao"]
 
 [tool.black]
 line-length = 88
