@@ -19,7 +19,7 @@ from curve_dao.vote_utils import (
 
 warnings.filterwarnings("ignore")
 
-RICH_CONSOLE = RichConsole(file=sys.stdout)
+console = RichConsole(file=sys.stdout)
 
 
 @click.command(
@@ -43,7 +43,7 @@ RICH_CONSOLE = RichConsole(file=sys.stdout)
     help="Check validity via fork simulation (default is False)",
 )
 def cli(network, vote_type: str, vote_id: int, simulate: bool):
-    RICH_CONSOLE.log(f"Decoding {vote_type} VoteID: {vote_id}")
+    console.log(f"Decoding {vote_type} VoteID: {vote_id}")
 
     try:
         script = get_vote_script(vote_id, vote_type)
@@ -54,12 +54,12 @@ def cli(network, vote_type: str, vote_id: int, simulate: bool):
         return
 
     description = get_description_from_vote_id(vote_id, vote_type)
-    RICH_CONSOLE.log(description)
+    console.log(description)
 
     votes = decode_vote_script(script)
     for vote in votes:
         formatted_output = vote["formatted_output"]
-        RICH_CONSOLE.log(formatted_output)
+        console.log(formatted_output)
 
     data = get_vote_data(vote_id, vote_type)
     results = decode_vote_data(data, vote_type)

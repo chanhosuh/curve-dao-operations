@@ -45,6 +45,7 @@ dependencies = [
 
 [project.scripts]
 decode = "curve_dao.scripts.decode:cli"
+set_vote = "curve_dao.scripts.set_vote:cli"
 
 [project.urls]
 Documentation = "https://curve-dao-operations.readthedocs.io"

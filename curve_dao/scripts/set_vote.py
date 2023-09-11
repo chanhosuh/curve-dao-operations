@@ -1,9 +1,12 @@
+import sys
+
 import ape
 import click
 from ape.api import accounts
 from ape.cli.choices import AccountAliasPromptChoice
 from ape.cli.options import _account_callback
 from ape.logging import logger
+from rich.console import Console as RichConsole
 
 from curve_dao import make_vote
 from curve_dao.actions.community_fund import community_fund_action
@@ -20,7 +23,8 @@ from curve_dao.addresses import (
 )
 from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import decode_vote_script, get_vote_script
-from scripts.decode import RICH_CONSOLE
+
+console = RichConsole(file=sys.stdout)
 
 
 # Missing name issue for AccountAliasPromptChoice is not fixed until
@@ -97,7 +101,7 @@ def whitelist(network, account, addr, description, simulate):
         votes = decode_vote_script(script)
         for vote in votes:
             formatted_output = vote["formatted_output"]
-            RICH_CONSOLE.log(formatted_output)
+            console.log(formatted_output)
         voting_contract = get_dao_voting_contract(vote_type)
         simulate_vote(vote_id, voting_contract)
 
@@ -165,7 +169,7 @@ def kill_gauge(
         votes = decode_vote_script(script)
         for vote in votes:
             formatted_output = vote["formatted_output"]
-            RICH_CONSOLE.log(formatted_output)
+            console.log(formatted_output)
         voting_contract = get_dao_voting_contract(vote_type)
         simulate_vote(vote_id, voting_contract)
 
@@ -370,7 +374,7 @@ def pegkeeper_debt_ceiling(
         votes = decode_vote_script(script)
         for vote in votes:
             formatted_output = vote["formatted_output"]
-            RICH_CONSOLE.log(formatted_output)
+            console.log(formatted_output)
         voting_contract = get_dao_voting_contract(vote_type)
         simulate_vote(vote_id, voting_contract)
 
@@ -443,6 +447,6 @@ def community_fund(
         votes = decode_vote_script(script)
         for vote in votes:
             formatted_output = vote["formatted_output"]
-            RICH_CONSOLE.log(formatted_output)
+            console.log(formatted_output)
         voting_contract = get_dao_voting_contract(vote_type)
         simulate_vote(vote_id, voting_contract)
