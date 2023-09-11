@@ -1,4 +1,4 @@
-eth-ape[recommended-plugins]==0.6.2
+eth-ape[recommended-plugins]>=0.6.19
 requests
 
 black==22.12.0
