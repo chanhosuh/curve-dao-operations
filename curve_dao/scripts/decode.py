@@ -3,6 +3,7 @@ import warnings
 
 import ape
 import click
+from ape.cli import NetworkBoundCommand, network_option
 from rich.console import Console as RichConsole
 
 from curve_dao.addresses import get_dao_voting_contract
@@ -22,10 +23,10 @@ RICH_CONSOLE = RichConsole(file=sys.stdout)
 
 
 @click.command(
-    cls=ape.cli.NetworkBoundCommand,
+    cls=NetworkBoundCommand,
     short_help="Decode Curve DAO proposal by Vote Type and ID",
 )
-@ape.cli.network_option()
+@network_option()
 @click.option(
     "--vote-type",
     "-t",
