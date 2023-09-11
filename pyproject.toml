@@ -44,7 +44,7 @@ dependencies = [
 ]
 
 [project.scripts]
-decode = "curve_dao.scripts.decode:cli"
+decode_vote = "curve_dao.scripts.decode_vote:cli"
 set_vote = "curve_dao.scripts.set_vote:cli"
 
 [project.urls]

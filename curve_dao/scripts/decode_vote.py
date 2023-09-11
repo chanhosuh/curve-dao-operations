@@ -28,12 +28,13 @@ console = RichConsole(file=sys.stdout)
 )
 @network_option()
 @click.option(
-    "--vote-type",
+    "--type",
     "-t",
+    "_type",
     type=click.Choice(["ownership", "parameter"]),
     required=True,
 )
-@click.option("--vote-id", "-v", type=int, required=True)
+@click.option("--id", "-i", "_id", type=int, required=True)
 @click.option(
     "--simulate",
     "-s",
@@ -42,8 +43,8 @@ console = RichConsole(file=sys.stdout)
     show_default=True,
     help="Check validity via fork simulation (default is False)",
 )
-def cli(network, vote_type: str, vote_id: int, simulate: bool):
-    console.log(f"Decoding {vote_type} VoteID: {vote_id}")
+def cli(network, _type: str, _id: int, simulate: bool):
+    console.log(f"Decoding {_type.title()} Vote: {_id}")
 
     try:
         script = get_vote_script(vote_id, vote_type)
@@ -53,7 +54,7 @@ def cli(network, vote_type: str, vote_id: int, simulate: bool):
         )
         return
 
-    description = get_description_from_vote_id(vote_id, vote_type)
+    description = get_description_from_vote_id(_id, _type)
     console.log(description)
 
     votes = decode_vote_script(script)
@@ -66,5 +67,5 @@ def cli(network, vote_type: str, vote_id: int, simulate: bool):
     RICH_CONSOLE.log(results["formatted_output"])
 
     if simulate:
-        voting_contract = get_dao_voting_contract(vote_type)
-        simulate_vote(vote_id, voting_contract)
+        voting_contract = get_dao_voting_contract(_type)
+        simulate_vote(_id, voting_contract)
