@@ -21,6 +21,7 @@ from curve_dao.addresses import (
     get_dao_voting_contract,
     select_target,
 )
+from curve_dao.ipfs import get_description_from_vote_id
 from curve_dao.simulate import simulate_vote
 from curve_dao.vote_utils import decode_vote_script, get_vote_script
 
@@ -85,7 +86,6 @@ def cli():
     help="Check validity via fork simulation (default is False)",
 )
 def whitelist(network, account, addr, description, simulate):
-
     vote_type = "ownership"
     target = get_dao_voting_contract(vote_type)
     vote_id = make_vote(
@@ -97,13 +97,7 @@ def whitelist(network, account, addr, description, simulate):
     logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
 
     if simulate:
-        script = get_vote_script(vote_id, "ownership")
-        votes = decode_vote_script(script)
-        for vote in votes:
-            formatted_output = vote["formatted_output"]
-            console.log(formatted_output)
-        voting_contract = get_dao_voting_contract(vote_type)
-        simulate_vote(vote_id, voting_contract)
+        _simulate(vote_id, vote_type)
 
 
 @cli.command(
@@ -165,13 +159,7 @@ def kill_gauge(
     logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
 
     if simulate:
-        script = get_vote_script(vote_id, "ownership")
-        votes = decode_vote_script(script)
-        for vote in votes:
-            formatted_output = vote["formatted_output"]
-            console.log(formatted_output)
-        voting_contract = get_dao_voting_contract(vote_type)
-        simulate_vote(vote_id, voting_contract)
+        _simulate(vote_id, vote_type)
 
 
 @cli.command(
@@ -370,13 +358,7 @@ def pegkeeper_debt_ceiling(
     logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
 
     if simulate:
-        script = get_vote_script(vote_id, vote_type)
-        votes = decode_vote_script(script)
-        for vote in votes:
-            formatted_output = vote["formatted_output"]
-            console.log(formatted_output)
-        voting_contract = get_dao_voting_contract(vote_type)
-        simulate_vote(vote_id, voting_contract)
+        _simulate(vote_id, vote_type)
 
 
 @cli.command(
@@ -443,10 +425,16 @@ def community_fund(
     logger.info(f"Proposal submitted successfully! VoteId: {vote_id}")
 
     if simulate:
-        script = get_vote_script(vote_id, vote_type)
-        votes = decode_vote_script(script)
-        for vote in votes:
-            formatted_output = vote["formatted_output"]
-            console.log(formatted_output)
-        voting_contract = get_dao_voting_contract(vote_type)
-        simulate_vote(vote_id, voting_contract)
+        _simulate(vote_id, vote_type)
+
+def _simulate(vote_id, vote_type:)
+    console.log(f"Decoding {vote_type} Vote: {vote_id}")
+    description = get_description_from_vote_id(vote_id, vote_type)
+    console.log(description)
+    script = get_vote_script(vote_id, vote_type)
+    votes = decode_vote_script(script)
+    for vote in votes:
+        formatted_output = vote["formatted_output"]
+        console.log(formatted_output)
+    voting_contract = get_dao_voting_contract(vote_type)
+    simulate_vote(vote_id, voting_contract)
