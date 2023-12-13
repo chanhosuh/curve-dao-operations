@@ -51,12 +51,14 @@ geth:
 
 The following is sufficient for installing all the dependencies (except one):
 
+```console
+$ python -m venv venv
+$ source ./venv/bin/activate
+$ pip install --upgrade pip
+$ pip install .
 ```
-> python -m venv venv
-> source ./venv/bin/activate
-> pip install --upgrade pip
-> pip install -r ./requirements.txt
-```
+
+**Note:** if you're planning on developing or customizing the codebase, you should do `pip install -e .`.  This will create an "editable" install.
 
 The `ape-hardhat` plugin also requires `hardhat`, which should be npm installed using the `package-lock.json`:
 
@@ -76,51 +78,38 @@ This is a read-only tool that allows access to all users (they don't need to be 
 Input args:
 
 1. `vote_id`: The vote ID of an on-chain proposal
+1. `type`: The voting type, `ownership` or `parameter`
 
 An example of its usage is show in the following:
 
-```
-$ ape run decode_executable decode --vote-type ownership --vote-id 223
+```console
+$ decode_vote --type ownership --id 423
 ```
 
 Output:
 
-```
-Decoding VoteID: 223
-Voting contract: 0xe478de485ad2fe566d49342cbd03e49ed7db3356 (ownership)
-Call via agent: 0x40907540d8a6C65c637785e8f8B742ae6b0b9968
- ├─ To: 0x5a8fdC979ba9b6179916404414F7BA4D8B77C8A1
- ├─ Function: set_killed
- └─ Inputs:
-    ├─ _gauge: 0x5AC6886Edd18ED0AD01C0B0910660637c551FBd6
-    └─ _is_killed: True
-
-Call via agent: 0x40907540d8a6C65c637785e8f8B742ae6b0b9968
- ├─ To: 0x2EF1Bc1961d3209E5743C91cd3fBfa0d08656bC3
- ├─ Function: set_killed
- └─ Inputs:
-    ├─ _gauge: 0xdC69D4cB5b86388Fff0b51885677e258883534ae
-    └─ _is_killed: True
-
-Call via agent: 0x40907540d8a6C65c637785e8f8B742ae6b0b9968
- ├─ To: 0x2EF1Bc1961d3209E5743C91cd3fBfa0d08656bC3
- ├─ Function: set_killed
- └─ Inputs:
-    ├─ _gauge: 0x16C2beE6f55dAB7F494dBa643fF52ef2D47FBA36
-    └─ _is_killed: True
-
-Results: Vote Passed (Execution Status: Executed)
-├─ Voting Start Time: 2022-10-18 14:25:47
-├─ Voting End Time: 2022-10-25 14:25:47
-├─ Votes For: 260936423.49
-├─ Votes Against: 0.0
-├─ Support: 100.0% (Required: 51%)
-└─ Quorum: 49.25% (Minimum: 30%)
+```console
+[15:05:26] Decoding Ownership Vote: 423
+[15:05:29] {'text': 'Add a gauge for the following pool:  cbETH/WETH on Base'}
+[15:05:30] Call via agent: 0x40907540d8a6C65c637785e8f8B742ae6b0b9968
+            ├─ To: 0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB
+            ├─ Function: add_gauge
+            └─ Inputs:
+               ├─ addr: 0xE9c898BA654deC2bA440392028D2e7A194E6dc3e
+               ├─ gauge_type: 5
+               └─ weight: 0
 ```
 
 # How to contribute:
 
-The goal is to cover all DAO operations in CLI tools. All utility scripts go to: `scripts/utils`, and all CLI tools are stored in the `scripts` folder.
+The ultimate goal is to enable all major DAO operations in the CLI.  The main entrypoint is `curve_dao/scripts`, which has the primary commands for decoding and creating votes. 
+
+In scope are:
+- voting
+- fee distribution
+- pegkeeper updates
+- crvUSD liquidations
+
 
 ## Pre-commit
 
