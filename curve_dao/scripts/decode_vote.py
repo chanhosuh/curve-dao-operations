@@ -47,11 +47,9 @@ def cli(network, _type: str, _id: int, simulate: bool):
     console.log(f"Decoding {_type.title()} Vote: {_id}")
 
     try:
-        script = get_vote_script(vote_id, vote_type)
+        script = get_vote_script(_id, _type)
     except MissingVote:
-        RICH_CONSOLE.log(
-            f"[red] VoteID not found in the {vote_type} DAO voting contract [/red]"
-        )
+        console.log(f"[red] VoteID not found in the {_type} DAO voting contract [/red]")
         return
 
     description = get_description_from_vote_id(_id, _type)
@@ -62,9 +60,9 @@ def cli(network, _type: str, _id: int, simulate: bool):
         formatted_output = vote["formatted_output"]
         console.log(formatted_output)
 
-    data = get_vote_data(vote_id, vote_type)
-    results = decode_vote_data(data, vote_type)
-    RICH_CONSOLE.log(results["formatted_output"])
+    data = get_vote_data(_id, _type)
+    results = decode_vote_data(data, _type)
+    console.log(results["formatted_output"])
 
     if simulate:
         voting_contract = get_dao_voting_contract(_type)
