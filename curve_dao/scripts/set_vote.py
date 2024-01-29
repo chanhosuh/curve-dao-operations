@@ -2,7 +2,7 @@ import sys
 
 import ape
 import click
-from ape.api import accounts
+from ape.cli import NetworkBoundCommand, account_option, network_option
 from ape.logging import logger
 from rich.console import Console as RichConsole
 
@@ -33,12 +33,12 @@ def cli():
 
 
 @cli.command(
-    cls=ape.cli.NetworkBoundCommand,
+    cls=NetworkBoundCommand,
     name="whitelist",
     short_help="Whitelist proposed contract to lock veCRV",
 )
-@ape.cli.network_option()
-@ape.cli.account_option()
+@network_option()
+@account_option()
 @click.option("--addr", "-a", type=str, required=True)
 @click.option("--description", "-d", type=str, required=True)
 @click.option(
@@ -65,12 +65,12 @@ def whitelist(network, account, addr, description, simulate):
 
 
 @cli.command(
-    cls=ape.cli.NetworkBoundCommand,
+    cls=NetworkBoundCommand,
     name="kill_gauge",
     short_help="Kill or unkill the specified gauge",
 )
-@ape.cli.network_option()
-@ape.cli.account_option()
+@network_option()
+@account_option()
 @click.option("--address", "-a", type=str, required=True, help="Gauge address")
 @click.option(
     "--kill",
@@ -127,12 +127,12 @@ def kill_gauge(
 
 
 @cli.command(
-    cls=ape.cli.NetworkBoundCommand,
+    cls=NetworkBoundCommand,
     name="change_parameters",
     short_help="Change parameters for a pool",
 )
-@ape.cli.network_option()
-@ape.cli.account_option()
+@network_option()
+@account_option()
 @click.option("--address", "-a", type=str, required=True, help="Pool address")
 @click.option(
     "--pool-type",
@@ -260,12 +260,12 @@ def change_parameters(
 
 
 @cli.command(
-    cls=ape.cli.NetworkBoundCommand,
+    cls=NetworkBoundCommand,
     name="pegkeeper_debt_ceiling",
     short_help="Set the pegkeeper debt ceiling",
 )
-@ape.cli.network_option()
-@ape.cli.account_option()
+@network_option()
+@account_option()
 @click.option("--address", "-a", type=str, required=True, help="Pegkeeper address")
 @click.option("--ceiling", "-c", type=int, required=True, help="New debt ceiling")
 @click.option("--description", "-d", type=str, required=True)
@@ -326,12 +326,12 @@ def pegkeeper_debt_ceiling(
 
 
 @cli.command(
-    cls=ape.cli.NetworkBoundCommand,
+    cls=NetworkBoundCommand,
     name="community_fund",
     short_help="Receive linearly vesting funds from the DAO Community Fund",
 )
-@ape.cli.network_option()
-@ape.cli.account_option()
+@network_option()
+@account_option()
 @click.option("--recipient", "-r", type=str, required=True, help="Recipient address")
 @click.option(
     "--amount", "-a", type=int, required=True, help="Amount of CRV (18 decimals)"
