@@ -32,8 +32,8 @@ def stableswap_gauge():
 
 @pytest.fixture(scope="module")
 def stableswap_factory_gauge():
-    # BUSD-FRAXBP
-    yield ape.Contract("0xAeac6Dcd12CC0BE74c8f99EfE4bB5205a1f9A608")
+    # GHO-FRAXBP
+    yield ape.Contract("0x4A325E066A1C4d76fec4778464Bed15a2772D93D")
 
 
 def test_kill_crypto_factory_gauge(vote_deployer, crypto_factory_gauge):
