@@ -98,6 +98,14 @@ Output:
                ├─ addr: 0xE9c898BA654deC2bA440392028D2e7A194E6dc3e
                ├─ gauge_type: 5
                └─ weight: 0
+
+           Results: Vote Passed (Execution Status: Executed)                                                                      decode_vote.py:65
+            ├─ Voting Start Time: 2023-08-31 15:16:59
+            ├─ Voting End Time: 2023-09-07 15:16:59
+            ├─ Votes For: 311722285.51
+            ├─ Votes Against: 0.0
+            ├─ Support: 100.0% (Required: 51%)
+            └─ Quorum: 49.55% (Minimum: 30%)
 ```
 
 # How to contribute:
