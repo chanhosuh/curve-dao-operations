@@ -3,8 +3,6 @@ import sys
 import ape
 import click
 from ape.api import accounts
-from ape.cli.choices import AccountAliasPromptChoice
-from ape.cli.options import _account_callback
 from ape.logging import logger
 from rich.console import Console as RichConsole
 
@@ -28,40 +26,6 @@ from curve_dao.vote_utils import decode_vote_script, get_vote_script
 console = RichConsole(file=sys.stdout)
 
 
-# Missing name issue for AccountAliasPromptChoice is not fixed until
-# version 0.6.11, see PR: https://github.com/ApeWorX/ape/pull/1486
-#
-# Our workaround is to just monkey-patch the init as in their fix.
-# This also allows us to customize `account_option` a bit.
-def __monkey_patch_init__(
-    self,
-    account_type=None,
-    prompt_message=None,
-    name="account",
-):
-    # NOTE: we purposely skip the constructor of `PromptChoice`
-    self._account_type = account_type
-    self._prompt_message = prompt_message or "Select an account"
-    self.name = name
-
-
-AccountAliasPromptChoice.__init__ = __monkey_patch_init__
-
-
-def account_option():
-    """
-    A CLI option that accepts either the account alias or the account number.
-    If not given anything, it will prompt the user to select an account.
-    """
-
-    return click.option(
-        "--account",
-        type=AccountAliasPromptChoice(),
-        help="Account index or alias",
-        callback=_account_callback,
-    )
-
-
 @click.group(short_help="Create a Curve DAO vote")
 def cli():
     """Cammand-line helper for creating different DAO votes"""
@@ -74,7 +38,7 @@ def cli():
     short_help="Whitelist proposed contract to lock veCRV",
 )
 @ape.cli.network_option()
-@account_option()
+@ape.cli.account_option()
 @click.option("--addr", "-a", type=str, required=True)
 @click.option("--description", "-d", type=str, required=True)
 @click.option(
@@ -106,7 +70,7 @@ def whitelist(network, account, addr, description, simulate):
     short_help="Kill or unkill the specified gauge",
 )
 @ape.cli.network_option()
-@account_option()
+@ape.cli.account_option()
 @click.option("--address", "-a", type=str, required=True, help="Gauge address")
 @click.option(
     "--kill",
@@ -168,7 +132,7 @@ def kill_gauge(
     short_help="Change parameters for a pool",
 )
 @ape.cli.network_option()
-@account_option()
+@ape.cli.account_option()
 @click.option("--address", "-a", type=str, required=True, help="Pool address")
 @click.option(
     "--pool-type",
@@ -427,7 +391,8 @@ def community_fund(
     if simulate:
         _simulate(vote_id, vote_type)
 
-def _simulate(vote_id, vote_type:)
+
+def _simulate(vote_id, vote_type):
     console.log(f"Decoding {vote_type} Vote: {vote_id}")
     description = get_description_from_vote_id(vote_id, vote_type)
     console.log(description)
